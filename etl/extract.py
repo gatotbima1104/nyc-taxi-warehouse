@@ -25,7 +25,7 @@ class TaxiExtractor(Exract):
             Helper.create_dir(output_path) # Make a dir from helper
             
             if output_path.exists():
-                print(f"File already exist: {output_path}")
+                print(f"✓ File already exists: {output_path}\n")
                 return output_path
             
             with requests.get(url=url, stream=True, timeout=30) as response:
@@ -50,6 +50,6 @@ class TaxiExtractor(Exract):
         """
             Ingesting data from downloaded file
         """
-        
+        print(f"[EXTRACT] {filename}")
         output_path = (self.base_dir / ".." / "data" / "raw" / filename)
         return self.download_file(url, output_path)
