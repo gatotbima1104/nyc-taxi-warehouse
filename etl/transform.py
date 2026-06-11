@@ -49,7 +49,15 @@ class TaxiTransformer(Transform):
             'tip_amount': 'float',
             'fare_amount': 'float',
             'total_amount': 'float',
-        })
+        })        
+        
+        return dataframe
+    
+    def enrichment_data(self, dataframe: Dataframe) -> Dataframe:
+        """
+            Enrichment dataframe
+        """
+        print('[ENRICH] Enrichment data columns ...')
         
         # Create some datetime columns
         dataframe['pickup_date'] = dataframe['pickup_datetime'].dt.date
@@ -83,14 +91,6 @@ class TaxiTransformer(Transform):
             'Y':'Store and Forward',
             'N':'Normal'
         })
-        
-        return dataframe
-    
-    def add_trip_duration(self, dataframe: Dataframe) -> Dataframe:
-        """
-            Transforming and Standarized dataframe
-        """
-        print('[ADD TRIP DURATION] Adding ...')
         
         dataframe.insert(
             3,
@@ -160,7 +160,7 @@ class TaxiTransformer(Transform):
             
         loaded_file = Helper.load_file(filepath)
         standardized_data = self.standardize_dtypes(loaded_file)
-        transformed_data = self.add_trip_duration(standardized_data)
+        transformed_data = self.enrichment_data(standardized_data)
         dataframe = self.merge_csv(filepath_lookup_table, transformed_data)
         self.export_to_csv(dataframe, output_name)
         return dataframe
