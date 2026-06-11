@@ -6,5 +6,8 @@ TAXI_ZONE_LOOKUP_TABLE = "taxi_zone_lookup.csv"
 
 CHUNK_SIZE = 8192
 
+VALID_DATA_PATH = "data/mart/mart_cleaned/valid/valid_yellow_tripdata_2026_01"
+INVALID_DATA_PATH = "data/mart/mart_cleaned/invalid/invalid_yellow_tripdata_2026_01"
+
 TRANSFORMED_FILE_PATH = '../db/transformed'
 TRANFORMED_FILE = 'transformed_yellow_tripdata_2026_01.csv'

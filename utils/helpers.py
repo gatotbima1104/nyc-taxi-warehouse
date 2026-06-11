@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import fastparquet
+from pandas import DataFrame
 
 class Helper:
     LOADERS = {
@@ -11,15 +12,17 @@ class Helper:
     }
     
     @staticmethod
-    def create_dir(output_path: Path) -> Path:
+    def create_dir(output_path: Path | str) -> Path:
         """
             Make a directory with pathlib
         """
+        output_path = Path(output_path)
+            
         output_path.parent.mkdir(parents=True, exist_ok=True)
         return output_path.parent
     
     @staticmethod
-    def load_file(filepath: Path):
+    def load_file(filepath: Path) -> DataFrame:
         """
             Load file
         """
@@ -33,4 +36,10 @@ class Helper:
         print(f'[LOAD] Loading {suffix} data ...')
         return Helper.LOADERS[suffix](filepath) # pd.read_csv(filepath)
         
-        
+    @staticmethod
+    def save_to_csv(dataframe: DataFrame, output_path: Path) -> None:
+        """
+            save file
+        """
+        Helper.create_dir(output_path)
+        dataframe.to_csv(output_path)

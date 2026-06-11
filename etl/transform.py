@@ -151,19 +151,14 @@ class TaxiTransformer(Transform):
         output_dir.mkdir(parents=True, exist_ok=True)
         dataframe.to_csv((output_dir / output_name), index=True)
         
-    def transform(self, filepath: str, filepath_lookup_table: str, output_name: str):
+    def transform(self, filepath: str, filepath_lookup_table: str, output_name: str) -> Dataframe:
         """
             Transform data
         """
-        
-        print("\n=========================== Transorming Data ....\n")
-        
+            
         loaded_file = Helper.load_file(filepath)
         standardized_data = self.standardize_dtypes(loaded_file)
         transformed_data = self.add_trip_duration(standardized_data)
         dataframe = self.merge_csv(filepath_lookup_table, transformed_data)
         self.export_to_csv(dataframe, output_name)
-        
-        print("\n=========================== Completed .....\n")
-        
-    
+        return dataframe
