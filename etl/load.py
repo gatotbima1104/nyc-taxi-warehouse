@@ -39,4 +39,6 @@ class TaxiLoader(Load):
         return valid_data, invalid_data
 
     def load(self, dataframe: DataFrame, output_path: Path):
+        print(f'[LOAD] Loading {len(dataframe):,} rows data ...')
         Helper.save_to_csv(dataframe, output_path)
+        print(f'[LOAD] Saved to {output_path} ...')

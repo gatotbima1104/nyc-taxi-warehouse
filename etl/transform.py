@@ -145,11 +145,13 @@ class TaxiTransformer(Transform):
         """
             Export dataframe to_csv
         """
-        print('[EXPORT] Exporting data ...')
+        print(f'[EXPORT] Exporting {len(dataframe):,} rows data ...')
         
         output_dir = Path('data/transformed')
         output_dir.mkdir(parents=True, exist_ok=True)
         dataframe.to_csv((output_dir / output_name), index=True)
+
+        print(f'[EXPORT] Saved to {str(output_dir) + output_name} ...')
         
     def transform(self, filepath: str, filepath_lookup_table: str, output_name: str) -> Dataframe:
         """
