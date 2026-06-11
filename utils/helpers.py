@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import fastparquet
 from pandas import DataFrame
+from datetime import datetime
 
 class Helper:
     LOADERS = {
@@ -43,3 +44,10 @@ class Helper:
         """
         Helper.create_dir(output_path)
         dataframe.to_csv(output_path)
+        
+    @staticmethod
+    def log(message: str):
+        timestamp = datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+        print(f"[INFO] {timestamp} - {message}", flush=True)
