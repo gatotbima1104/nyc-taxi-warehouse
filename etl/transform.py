@@ -23,7 +23,16 @@ class TaxiTransformer(Transform):
             Removing null values
         """
         print('[CLEAN] Removing null values ...')
-        return dataframe.dropna()
+        
+        for col in dataframe.columns:
+            if dataframe[col].dtype == "object":
+                dataframe[col] = dataframe[col].fillna("Unknown")
+            elif pd.api.types.is_numeric_dtype(dataframe[col]):
+                dataframe[col] = dataframe[col].fillna(-999)
+            elif pd.api.types.is_bool_dtype(dataframe[col]):
+                pass
+            
+        return dataframe
     
     def standardize_dtypes(self, dataframe: Dataframe) -> Dataframe:
         """

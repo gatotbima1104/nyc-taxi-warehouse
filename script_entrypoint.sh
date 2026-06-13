@@ -10,7 +10,9 @@ mkdir -p logs
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting Pipeline" \
 | tee -a "$LOG_FILE"
 
-python -u app.py 2>&1 | tee -a "$LOG_FILE" | grep "^\[INFO\]"
+python -u app.py 2>&1 \
+| tee -a "$LOG_FILE" \
+| grep --line-buffered "^\[INFO\]"
 
 if [ ${PIPESTATUS[0]} -eq 0 ]; then
     echo "$(date '+%Y-%m-%d %H:%M:%S') - Pipeline completed successfully" \
