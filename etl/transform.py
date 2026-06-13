@@ -38,7 +38,7 @@ class TaxiTransformer(Transform):
         """
             Transforming and Standarized dataframe
         """
-        print('[STANDARDIZE] Standaring and Generaling data ...')
+        print('[STANDARDIZE] Standardizing data ...')
         
         # Renaming column
         dataframe = dataframe.rename(columns={
@@ -160,7 +160,7 @@ class TaxiTransformer(Transform):
         output_dir.mkdir(parents=True, exist_ok=True)
         dataframe.to_csv((output_dir / output_name), index=True)
 
-        print(f'[EXPORT] Saved to {str(output_dir) + output_name} ...')
+        print(f'[EXPORT] Saved to {str(output_dir) + "/" + output_name} ...')
         
     def transform(self, filepath: str, filepath_lookup_table: str, output_name: str) -> Dataframe:
         """
