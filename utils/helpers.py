@@ -49,7 +49,8 @@ class Helper:
         
     @staticmethod
     def log(message: str):
-        print(f"[INFO] {message}", flush=True)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[INFO] {timestamp} - {message}", flush=True)
 
     @staticmethod
     def measure(step_name: str, func: Callable):

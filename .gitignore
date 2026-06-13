@@ -11,3 +11,5 @@ env/
 
 *.parquet
 *.csv
+
+pipeline.log

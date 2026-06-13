@@ -1,3 +1,5 @@
+import time
+
 from pandas import DataFrame
 
 from etl.extract import TaxiExtractor
@@ -57,24 +59,41 @@ def load(valid_data: DataFrame, invalid_data: DataFrame):
         )
     
 def main():
+    pipeline_start = time.perf_counter()
+    
+    Helper.log("=" * 50)
     extracted_files = Helper.measure(
         "Extract",
-        extract()
+        extract
     )
+    Helper.log("=" * 50)
+    
     transformed_df = Helper.measure(
         "Transform",
         lambda: transform(extracted_files)
     )
+    Helper.log("=" * 50)
     
     valid_data, invalid_data = Helper.measure(
         "Validate",
         lambda: validate(transformed_df)
     )
+    Helper.log("=" * 50)
     
     Helper.measure(
         "Load",
         lambda: load(valid_data, invalid_data)
     )
+    Helper.log("=" * 50)
+    
+    total_duration = time.perf_counter() - pipeline_start
+    
+    Helper.log("REPORT\n")
+    Helper.log(f"Valid Rows     : {len(valid_data):,}")
+    Helper.log(f"Invalid Rows   : {len(invalid_data):,}")
+    Helper.log(f"Total Rows     : {len(valid_data) + len(invalid_data):,}")
+    Helper.log(f"Execution Time : {total_duration:.2f}s")
+    Helper.log("=" * 50)
     
 if __name__ == "__main__":
     main()
