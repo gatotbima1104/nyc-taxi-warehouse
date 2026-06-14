@@ -11,7 +11,7 @@ class Load(ABC):
     
     
 class TaxiLoader(Load):
-    def validate_data(self, dataframe: DataFrame) -> tuple[DataFrame, DataFrame]:        
+    def validate_data(self, dataframe: DataFrame) -> tuple[DataFrame, DataFrame, dict]:        
         """
             Validate valid, invalid dataset
         """
@@ -36,7 +36,16 @@ class TaxiLoader(Load):
             ~(duration_invalid | distance_invalid)
         ].copy() # VALID
         
-        return valid_data, invalid_data
+        stats = {
+            "invalid_duration" : int(duration_invalid.sum()),
+            "invalid_distance" : int(distance_invalid.sum())
+        }
+        
+        return (
+            valid_data,
+            invalid_data,
+            stats
+        )
 
     def load(self, dataframe: DataFrame, output_path: Path):
         print(f'[LOAD] Loading {len(dataframe):,} rows data ...')

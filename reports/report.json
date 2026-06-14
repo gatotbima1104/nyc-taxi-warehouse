@@ -1,0 +1,11 @@
+{
+    "timestamp": "2026-06-14T09:20:30.136673",
+    "total_records": 3724889,
+    "valid_records": 3555245,
+    "invalid_records": {
+        "total": 169644,
+        "invalid_duration": 45070,
+        "invalid_distance": 125738
+    },
+    "execution_time_seconds": 63.49
+}

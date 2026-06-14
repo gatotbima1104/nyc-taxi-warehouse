@@ -1,4 +1,6 @@
 import time
+import json
+import pandas as pd
 
 from pandas import DataFrame
 
@@ -74,7 +76,7 @@ def main():
     )
     Helper.log("=" * 50)
     
-    valid_data, invalid_data = Helper.measure(
+    valid_data, invalid_data, stats = Helper.measure(
         "Validate",
         lambda: validate(transformed_df)
     )
@@ -88,12 +90,19 @@ def main():
     
     total_duration = time.perf_counter() - pipeline_start
     
-    Helper.log("REPORT\n")
-    Helper.log(f"Valid Rows     : {len(valid_data):,}")
-    Helper.log(f"Invalid Rows   : {len(invalid_data):,}")
-    Helper.log(f"Total Rows     : {len(valid_data) + len(invalid_data):,}")
-    Helper.log(f"Execution Time : {total_duration:.2f}s")
-    Helper.log("=" * 50)
+    report = Helper.generate_report(
+        execution_time=total_duration,
+        invalid_data=invalid_data,
+        valid_data=valid_data,
+        stats=stats
+    )
+    
+    path = "reports/report.json"
+    
+    Helper.create_dir(path)
+    with open(path, "w+") as f:
+        json.dump(report, f, indent=4)
+    
     
 if __name__ == "__main__":
     main()

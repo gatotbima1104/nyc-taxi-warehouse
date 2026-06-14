@@ -48,7 +48,7 @@ class Helper:
         dataframe.to_csv(output_path)
         
     @staticmethod
-    def log(message: str):
+    def log(message: str) -> str:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"[INFO] {timestamp} - {message}", flush=True)
 
@@ -62,3 +62,51 @@ class Helper:
 
         Helper.log(f"{step_name} completed in {duration:.2f}s")
         return result
+    
+    @staticmethod
+    def generate_report(valid_data: DataFrame, invalid_data: DataFrame, stats: dict, execution_time: float) -> None:
+        total_rows = len(valid_data) + len(invalid_data)
+
+        valid_pct = (
+            len(valid_data) / total_rows * 100
+            if total_rows else 0
+        )
+
+        invalid_pct = (
+            len(invalid_data) / total_rows * 100
+            if total_rows else 0
+        )
+
+        Helper.log("DATA QUALITY REPORT")
+        Helper.log("")
+
+        Helper.log("Dataset Summary")
+        Helper.log("-" * 15)
+        Helper.log(f"Total Records      : {total_rows:,}")
+        Helper.log(f"Valid Records      : {len(valid_data):,} ({valid_pct:.2f}%)")
+        Helper.log(f"Invalid Records    : {len(invalid_data):,} ({invalid_pct:.2f}%)")
+
+        Helper.log("")
+        Helper.log("Invalid Record Breakdown")
+        Helper.log("-" * 24)
+        Helper.log(f"Duration Invalid   : {stats['invalid_duration']:,}")
+        Helper.log(f"Distance Invalid   : {stats['invalid_distance']:,}")
+
+        Helper.log("")
+        Helper.log("Pipeline")
+        Helper.log("-" * 8)
+        Helper.log(f"Execution Time     : {execution_time:.2f}s")
+
+        Helper.log("=" * 50)
+        
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "total_records": int(total_rows),
+            "valid_records": len(valid_data),
+            "invalid_records": {
+                "total": len(invalid_data),
+                "invalid_duration": stats['invalid_duration'],
+                "invalid_distance": stats['invalid_distance']
+            },
+            "execution_time_seconds": round(execution_time, 2)
+        }
