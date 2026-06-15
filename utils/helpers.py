@@ -45,10 +45,11 @@ class Helper:
             save file
         """
         Helper.create_dir(output_path)
-        dataframe.to_csv(output_path)
+        dataframe.to_csv(output_path, index=False)
         
     @staticmethod
     def log(message: str, isShowTimestamp: bool = True) -> str:
+        """logging information"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if isShowTimestamp:
             print(f"[INFO] {timestamp} - {message}", flush=True)
@@ -57,6 +58,7 @@ class Helper:
 
     @staticmethod
     def measure(step_name: str, func: Callable):
+        """measure time performance"""
         Helper.log(f"{step_name} ...")
 
         start = time.perf_counter()
@@ -68,6 +70,7 @@ class Helper:
     
     @staticmethod
     def generate_report(valid_data: DataFrame, invalid_data: DataFrame, stats: dict, execution_time: float) -> None:
+        """reporting dataset information"""
         total_rows = len(valid_data) + len(invalid_data)
 
         valid_pct = (
