@@ -209,5 +209,6 @@ class TaxiTransformer(Transform):
         dataframe = self.merge_csv(filepath_lookup_table, transformed_data)
         self.export_to_csv(dataframe, output_name)
         
-        valid_data, invalid_data, stats = self.validate_data(dataframe)
-        return (valid_data, invalid_data, stats)
+        # valid_data, invalid_data, stats = self.validate_data(dataframe)
+        # return (valid_data, invalid_data, stats)
+        return dataframe

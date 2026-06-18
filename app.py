@@ -66,9 +66,16 @@ def main():
     )
     Helper.log("=" * 50)
     
-    valid_data, invalid_data, stats = Helper.measure(
-        "Transform and Validate",
+    transformed_df = Helper.measure(
+        "Transform",
         lambda: transform(extracted_files)
+    )
+    Helper.log("=" * 50)
+    
+    taxi_transformer = TaxiTransformer()
+    valid_data, invalid_data, stats = Helper.measure(
+        "Validate",
+        lambda: taxi_transformer.validate_data(transformed_df)
     )
     Helper.log("=" * 50)
     
