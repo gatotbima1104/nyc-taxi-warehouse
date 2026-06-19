@@ -14,3 +14,4 @@ env/
 
 pipeline.log
 report.json
+.env

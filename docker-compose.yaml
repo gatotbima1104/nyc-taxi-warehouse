@@ -2,10 +2,10 @@ services:
   nyc-taxi-warehouse:
     build: .
     environment:
-      - TAXI_DATA_URL=https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-01.parquet
-      - TAXI_ZONE_LOOKUP_URL=https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
-      - TAXI_DATA_FILENAME=yellow_tripdata_2026_01.parquet
-      - TAXI_ZONE_LOOKUP_TABLE=taxi_zone_lookup.csv
+      TAXI_DATA_URL: ${TAXI_DATA_URL}
+      TAXI_ZONE_LOOKUP_URL: ${TAXI_ZONE_LOOKUP_URL}
+      TAXI_DATA_FILENAME: ${TAXI_DATA_FILENAME}
+      TAXI_ZONE_LOOKUP_TABLE: ${TAXI_ZONE_LOOKUP_TABLE}
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs

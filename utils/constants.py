@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 TAXI_DATA_URL = os.getenv("DATA_URL") or "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-01.parquet"
 TAXI_ZONE_LOOKUP_URL = os.getenv("TAXI_ZONE_LOOKUP_URL") or "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
