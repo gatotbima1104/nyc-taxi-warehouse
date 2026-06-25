@@ -20,7 +20,7 @@ class TaxiExtractor(Exract):
             Helper.create_dir(output_path) # Make a dir from helper
             
             if output_path.exists():
-                print(f"✓ File already exists: {output_path}")
+                print(f"✓ File already exists: {output_path.relative_to(self.base_dir)}")
                 return output_path
             
             with requests.get(url=url, stream=True, timeout=30) as response:
