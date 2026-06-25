@@ -4,10 +4,11 @@ import os
 load_dotenv()
 
 POSTGRES_HOST = os.getenv("POSTGRES_HOST") or "localhost"
-POSTGRES_PORT = os.getenv("POSTGRES_PORT") or "5432"
+POSTGRES_PORT = int(os.getenv("POSTGRES_PORT")) or 5432
 POSTGRES_DB = os.getenv("POSTGRES_DB") or ""
 POSTGRES_USER = os.getenv("POSTGRES_USER") or "postgres"
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "postgres"
+POSTGRES_URL = os.getenv("POSTGRES_URL") or ""
 
 TAXI_DATA_URL = os.getenv("DATA_URL") or "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-01.parquet"
 TAXI_ZONE_LOOKUP_URL = os.getenv("TAXI_ZONE_LOOKUP_URL") or "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"

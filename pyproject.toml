@@ -8,7 +8,9 @@ dependencies = [
     "dotenv>=0.9.9",
     "pandas>=3.0.3",
     "pathlib>=1.0.1",
+    "psycopg2-binary>=2.9.12",
     "pyarrow>=24.0.0",
     "requests>=2.34.2",
+    "sqlalchemy>=2.0.51",
     "tqdm>=4.68.3",
 ]
