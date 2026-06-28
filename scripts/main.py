@@ -15,6 +15,21 @@ from utils.constants import (
 from scripts.database import DatabaseConnection
 from scripts.loader import BronzeLoader
 from scripts.schema_manager import SchemaManager
+from scripts.loader import Layer
+
+# database connection
+connection = DatabaseConnection(
+    POSTGRES_URL,
+    POSTGRES_HOST,
+    POSTGRES_PORT,
+    POSTGRES_DB,
+    POSTGRES_USER,
+    POSTGRES_PASSWORD
+)
+conn = connection.get_connection()
+
+# schema
+schema = SchemaManager(conn)
 
 def extract() -> list[str]:
     extract_files = [
@@ -33,25 +48,26 @@ def extract() -> list[str]:
     return downloaded_files
 
 def load_to_bronze():
-    connection = DatabaseConnection(
-        POSTGRES_URL,
-        POSTGRES_HOST,
-        POSTGRES_PORT,
-        POSTGRES_DB,
-        POSTGRES_USER,
-        POSTGRES_PASSWORD
-    )
-    conn = connection.get_connection()
-    
-    schema = SchemaManager(conn)
+    # L1 --> BRONZE LAYER
     loader = BronzeLoader(conn)
     
-    schema.execute_sql(Path('db/init/01_schema.sql'))
-    schema.execute_sql(Path('db/init/02_bronze_load.sql'))
+    schema.execute(Path('db/init/01_schema.sql'))
+    schema.execute(Path('db/init/02_bronze_load.sql'))
+    loader.load_data(Path("data/raw/raw_yellow_tripdata_2026_01.parquet"), "raw_taxi_trips", Layer.BRONZE)
+    loader.load_data(Path("data/raw/taxi_zone_lookup.csv"), "raw_taxi_lookup", Layer.BRONZE)
     
-    loader.load_data(Path("data/raw/raw_yellow_tripdata_2026_01.parquet"), "raw_taxi_trips")
-    loader.load_data(Path("data/raw/taxi_zone_lookup.csv"), "raw_taxi_lookup")
+def transform_to_silver():
+    # L2 --> SILVER LAYER
+    silver_layer = [
+        Path('db/init/03_silver_transform.sql'),
+        *sorted(Path('db/schemas/silver').glob('*.sql'))
+    ]
+    schema.execute_many(silver_layer)
+    print(f'[LOAD TO SILVER] Loaded {schema.fetch("SELECT COUNT(*) FROM silver.taxi_trips_cleaned"):,} valid rows ...')
+    print(f'[LOAD TO SILVER] Loaded {schema.fetch("SELECT COUNT(*) FROM silver.data_quality_issues"):,} invalid rows ...')
+    
 
 if __name__ == '__main__':
     extract()
     load_to_bronze()
+    transform_to_silver()
