@@ -1,5 +1,5 @@
 [project]
-name = "nyc-taxi-data-warehouse"
+name = "nyc-taxi-warehouse"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
