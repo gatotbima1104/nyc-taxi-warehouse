@@ -2,20 +2,85 @@ BEGIN;
 
 TRUNCATE TABLE silver.data_quality_issues RESTART IDENTITY;
 
-INSERT INTO silver.data_quality_issues (
+INSERT INTO silver.data_quality_issues(
     vendor_id,
     pickup_datetime,
     dropoff_datetime,
+    passenger_count,
+    trip_distance,
+    rate_code_id,
+    store_and_fwd_flag,
     pickup_location_id,
     dropoff_location_id,
+    payment_type,
+    fare_amount,
+    tip_amount,
+    total_amount,
+
+    pickup_date,
+    pickup_hour,
+    pickup_day_time,
+    is_weekend,
+    time_period,
+    trip_duration_minutes,
+
+    pickup_borough,
+    pickup_zone,
+    dropoff_borough,
+    dropoff_zone,
     error_type
 )
 SELECT
     VendorID,
-    tpep_pickup_datetime,
-    tpep_dropoff_datetime,
+    tpep_pickup_datetime::TIMESTAMP,
+    tpep_dropoff_datetime::TIMESTAMP,
+    COALESCE(passenger_count::INTEGER, 0),
+    COALESCE(trip_distance::NUMERIC(10,2), -999),
+    COALESCE(RatecodeID::INTEGER, -999),
+    CASE store_and_fwd_flag
+        WHEN 'Y' THEN 'Store and Forward'
+        WHEN 'N' THEN 'Normal'
+        ELSE 'Unknown'
+    END,
     PULocationID,
     DOLocationID,
+    CASE payment_type
+        WHEN 1 THEN 'Credit Card'
+        WHEN 2 THEN 'Cash'
+        WHEN 3 THEN 'No Charge'
+        WHEN 4 THEN 'Dispute'
+        WHEN 0 THEN 'Unknown'
+        ELSE 'Unknown'
+    END,
+    COALESCE(fare_amount, -999),
+    COALESCE(tip_amount, -999),
+    COALESCE(total_amount, -999),
+
+    DATE(tpep_pickup_datetime),
+    EXTRACT(HOUR FROM tpep_pickup_datetime)::INTEGER,
+    TRIM(TO_CHAR(tpep_pickup_datetime,'Day')),
+    CASE 
+        WHEN EXTRACT(DOW FROM tpep_pickup_datetime) IN (0,6) THEN TRUE
+        ELSE FALSE
+    END,
+    CASE
+        WHEN EXTRACT(HOUR FROM tpep_pickup_datetime) BETWEEN 0 AND 4 THEN 'Late Night'
+        WHEN EXTRACT(HOUR FROM tpep_pickup_datetime) BETWEEN 5 AND 11 THEN 'Morning'
+        WHEN EXTRACT(HOUR FROM tpep_pickup_datetime) BETWEEN 12 AND 16 THEN 'Afternoon'
+        WHEN EXTRACT(HOUR FROM tpep_pickup_datetime) BETWEEN 17 AND 20 THEN 'Evening'
+        ELSE 'Night'
+    END,
+    ROUND(
+        (
+            EXTRACT(EPOCH FROM (
+                tpep_dropoff_datetime - tpep_pickup_datetime
+            )) / 60   
+        )::NUMERIC,2
+    ),
+    spu.borough,
+    spu.zone,
+    sdo.borough,
+    sdo.zone,
     CASE
         WHEN tpep_pickup_datetime >= tpep_dropoff_datetime THEN 'duration invalid'
         WHEN trip_distance <= 0 THEN 'distance invalid'
@@ -23,7 +88,11 @@ SELECT
         WHEN fare_amount <= 0 THEN 'fare_amount invalid'
         WHEN tip_amount <= 0 THEN 'tip_amount invalid'
     END
-FROM bronze.raw_taxi_trips
+FROM bronze.raw_taxi_trips brt
+LEFT JOIN silver.taxi_zones spu
+    ON brt.PULocationID = spu.location_id
+LEFT JOIN silver.taxi_zones sdo
+    ON brt.DOLocationID = sdo.location_id
 WHERE tpep_pickup_datetime >= tpep_dropoff_datetime 
     OR trip_distance <= 0
     OR passenger_count <= 0
