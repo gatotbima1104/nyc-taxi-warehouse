@@ -32,6 +32,7 @@ conn = connection.get_connection()
 schema = SchemaManager(conn)
 
 def extract() -> list[str]:
+    print("\n")
     extract_files = [
         (TAXI_DATA_URL, TAXI_DATA_FILENAME),
         (TAXI_ZONE_LOOKUP_URL, TAXI_ZONE_LOOKUP_TABLE)
@@ -44,7 +45,7 @@ def extract() -> list[str]:
         downloaded_files.append(
             extractor.extract(url, filename)
         )
-    
+    print('\n[INFO] Extract successfully ... \n')
     return downloaded_files
 
 def load_to_bronze():
@@ -55,7 +56,8 @@ def load_to_bronze():
     schema.execute(Path('db/init/02_bronze_load.sql'))
     loader.load_data(Path("data/raw/raw_yellow_tripdata_2026_01.parquet"), "raw_taxi_trips", Layer.BRONZE)
     loader.load_data(Path("data/raw/taxi_zone_lookup.csv"), "raw_taxi_lookup", Layer.BRONZE)
-    
+    print('\n[INFO] Ingest to Bronze successfully ... \n')
+ 
 def transform_to_silver():
     # L2 --> SILVER LAYER
     silver_layer = [
@@ -65,7 +67,8 @@ def transform_to_silver():
     schema.execute_many(silver_layer)
     print(f'[LOAD TO SILVER] Loaded {schema.fetch("SELECT COUNT(*) FROM silver.taxi_trips_cleaned"):,} valid rows ...')
     print(f'[LOAD TO SILVER] Loaded {schema.fetch("SELECT COUNT(*) FROM silver.data_quality_issues"):,} invalid rows ...')
-    
+    print('\n[INFO] Transform to Silver successfully ... \n')
+
 def analytics_to_gold():
     # L3 --> GOLD LAYER
     gold_layer = [
@@ -73,9 +76,16 @@ def analytics_to_gold():
         *sorted(Path('db/schemas/gold').glob('*.sql'))
     ]
     schema.execute_many(gold_layer)
+    print('\n[INFO] Analytics to Gold successfully ... \n')
+
+def create_views():
+    # CREATE VIEWS
+    schema.execute(Path('db/init/05_views.sql'))
+    print('\n[INFO] Views created successfully ... \n')
 
 if __name__ == '__main__':
     extract()
     load_to_bronze()
     transform_to_silver()
     analytics_to_gold()
+    create_views()
