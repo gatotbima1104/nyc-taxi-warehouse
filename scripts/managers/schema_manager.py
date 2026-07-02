@@ -31,3 +31,40 @@ class SchemaManager():
         with self.connection.cursor() as cur:
             cur.execute(sql)
             return cur.fetchone()[0]
+
+    def report(self, filepath: Path) -> int:
+        sql = self.read(filepath)
+        
+        if not sql:
+             print(f"[SKIP] {filepath.name} (empty file)")
+             return 0
+
+        with self.connection.cursor() as cur:
+            cur.execute(sql)
+            columns = [desc[0] for desc in cur.description]
+            rows = cur.fetchall()
+
+        print("\n" + "=" * 80)
+        print(f"[BUSINESS QUERY] {filepath.stem}")
+        print("=" * 80)
+
+        print(" | ".join(columns))
+        print("-" * 80)
+
+        for row in rows[:10]:
+            print(" | ".join(str(v) for v in row))
+
+        if len(rows) > 10:
+            print(f"... ({len(rows) - 10} more rows)")
+
+        print(f"\nReturned {len(rows)} rows\n")
+
+        return len(rows)
+    
+    def report_many(self, filepaths: list[Path]) -> int:
+        total_rows = 0
+
+        for filepath in filepaths:
+            total_rows += self.report(filepath)
+
+        return total_rows

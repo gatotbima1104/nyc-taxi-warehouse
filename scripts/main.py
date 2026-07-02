@@ -19,6 +19,7 @@ from scripts.bronze_loader import BronzeLoader
 from scripts.managers.schema_manager import SchemaManager
 from scripts.managers.audit_manager import AuditManager
 from scripts.bronze_loader import Layer
+from utils.helpers import Helper
 
 # database connection
 connection = DatabaseConnection(
@@ -49,7 +50,8 @@ def extract() -> list[str]:
         downloaded_files.append(
             extractor.extract(url, filename)
         )
-    print('\n[INFO] Extract successfully ... \n')
+    
+    Helper.log(message="Extract successfully ...")
     return downloaded_files
 
 def load_to_bronze():
@@ -79,7 +81,7 @@ def load_to_bronze():
             message="[BRONZE] Bronze layer loaded successfully."
         )
         
-        print('\n[INFO] Ingest to Bronze successfully ... \n')
+        Helper.log(message="Ingest to Bronze successfully ...")
         
     except Exception as e:
         conn.rollback()
@@ -137,7 +139,7 @@ def transform_to_silver():
             message="[SILVER] Invalid Data loaded successfully."
         )
         
-        print('\n[INFO] Transform to Silver successfully ... \n')
+        Helper.log(message="Transform to Silver successfully ... ")
         
     except Exception as e:
         conn.rollback()
@@ -172,7 +174,7 @@ def analytics_to_gold():
             status="SUCCESS",
             message="[GOLD] Silver layer loaded successfully."
         )
-        print('\n[INFO] Analytics to Gold successfully ... \n')
+        Helper.log(message="Analytics to Gold successfully ... ")
         
     except Exception as e:
         conn.rollback()
@@ -190,7 +192,47 @@ def analytics_to_gold():
 def create_views():
     # CREATE VIEWS
     schema.execute(Path('db/init/05_views.sql'))
-    print('\n[INFO] Views created successfully ... \n')
+    Helper.log(message="Views created successfully ... ")
+    
+def gold_analytics():
+    # BUSINESS DATA MODELLING
+    start = datetime.now()
+
+    try:
+
+        queries = sorted(
+            Path("db/queries").glob("*.sql")
+        )
+
+        total_rows = schema.report_many(queries)
+
+        audit.log_pipeline(
+            layer="gold",
+            process_name="business analytics",
+            start_time=start,
+            end_time=datetime.now(),
+            rows_processed=total_rows,
+            status="SUCCESS",
+            message="[ANALYTICS] Business queries executed successfully."
+        )
+
+        Helper.log(message="Business Analytics completed ...")
+
+    except Exception as e:
+
+        conn.rollback()
+
+        audit.log_pipeline(
+            layer="gold",
+            process_name="business analytics",
+            start_time=start,
+            end_time=datetime.now(),
+            rows_processed=0,
+            status="FAILED",
+            message=str(e)
+        )
+
+        raise
 
 if __name__ == '__main__':
     extract()
@@ -198,3 +240,4 @@ if __name__ == '__main__':
     transform_to_silver()
     analytics_to_gold()
     create_views()
+    gold_analytics()
