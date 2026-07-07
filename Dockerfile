@@ -10,4 +10,5 @@ RUN uv sync --frozen
 
 COPY . .
 
-CMD ["bash", "scripts/entrypoint.sh"]
+# Keep container alive waiting for pipeline running with command `bash run_pipeline.sh`
+CMD ["tail", "-f", "/dev/null"]
