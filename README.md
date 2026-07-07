@@ -191,7 +191,7 @@ Logging tables for maintainable pipelines logs
 1. Clone the repository.
 
 ```bash
-git clone https://github.com/gatotbima1104/nyx-taxi-warehouse.git
+git clone https://github.com/gatotbima1104/nyc-taxi-warehouse.git
 
 cd nyc-taxi-warehouse
 ```
