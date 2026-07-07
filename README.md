@@ -248,6 +248,11 @@ Expected reporting data template
   - The results show that demand frequently peaks during the late afternoon and evening commuting hours (around **5–6 PM**).
    ![alt text](docs/peak_hour.png)
 
+- **Most Frequent Pickup-to-Dropoff Routes**
+  - Identifies the pickup and dropoff zone pairs with the highest number of completed trips.
+  - This analysis reveals the most common travel patterns across the zone, helping identify high-demand routes that may be useful for operational planning, resource allocation, and transportation analysis.
+   ![alt text](docs/top_routes_zone.png)
+
 - **Data Quality Issues**
   - Summarizes records that failed validation during the Silver layer transformation.
   - Invalid records are categorized by error type, including:
@@ -255,7 +260,7 @@ Expected reporting data template
     - Invalid trip duration
     - Invalid fare amount
     - Invalid passenger count
-   ![alt text](image.png)
+   ![alt text](docs/error_type.png)
 
 - **Top Pickup Zones by Revenue**
   - Identifies the pickup locations that generate the highest total revenue.
