@@ -45,14 +45,22 @@ nyc-taxi-warehouse/
 │      ├── silver/
 │      └── gold/
 ├── scripts/
-│   └── managers/
+│   ├── run_pipeline.sh  # Entrypoint 
+│   ├── managers/
+│   ├── reporters/
+│   └── layers/
+│       ├── bronze/
+│       ├── silver/
+│       └── gold/
 ├── logs/
+│   ├── pipeline.log
+│   └── business_analytics.log
 ├── docs/
 ├── utils/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── env.example
-├── main.py
+├── main.py             # Main app
 └── README.md
 ```
 
@@ -198,22 +206,38 @@ cp .env.example .env
 
 ```env
 # PostgreSQL
-POSTGRES_HOST=db # default following the docker services network
+POSTGRES_HOST=db  # Note: default host=db following docker setup
 POSTGRES_PORT=
 POSTGRES_DB=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
-POSTGRES_URL=
+POSTGRES_URL=     # Note: default host=db following docker setup
 
-# Dataset
+# Dataset (Change based on your yyyy-mm needed) as dummy used 2026-01
 TAXI_URL=https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2026-01.parquet
+TAXI_ZONE_LOOKUP_URL=https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+TAXI_DATA_FILENAME=raw_yellow_tripdata_2026_01.parquet
+TAXI_ZONE_LOOKUP_TABLE=taxi_zone_lookup.csv
 ```
 
 4. Build and start the services.
 
 ```bash
-docker compose up --build
+docker compose up -d --build
 ```
+
+```bash
+bash scripts/run_pipeline.sh
+```
+
+5. Expected Output
+![alt text](docs/docker_logs.png)
+
+## Report
+
+![alt text](docs/report_data.png)
+
+For further analytics and seeing logs, you can dive deeper in `logs/pipeline.log` and `logs/business_analytics.log`
 
 ## Future Improvements
 
