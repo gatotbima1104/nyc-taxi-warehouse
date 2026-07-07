@@ -1,7 +1,6 @@
 from datetime import datetime
-from pathlib import Path
 from utils.helpers import Helper
-
+from scripts.configs import GOLD_SQL_FILES
 from scripts.managers import (
     SchemaManager,
     AuditManager
@@ -17,11 +16,7 @@ class GoldMartBuilder:
         start = datetime.now()
     
         try:
-            gold_layer = [
-                Path('db/init/04_gold_mart.sql'),
-                *sorted(Path('db/schemas/gold').glob('*.sql'))
-            ]
-            self.schema.execute_many(gold_layer)
+            self.schema.execute_many(GOLD_SQL_FILES)
             
             self.audit.log_pipeline(
                 layer="gold",

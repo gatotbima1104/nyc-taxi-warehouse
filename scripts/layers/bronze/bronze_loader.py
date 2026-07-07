@@ -2,19 +2,14 @@ from utils.helpers import Helper
 from io import StringIO
 from psycopg2.extensions import connection as PGConnection
 from pandas import DataFrame
-from enum import StrEnum
 from datetime import datetime
-from pathlib import Path
 
+from scripts.layers.layer_model import Layer
+from scripts.configs import BRONZE_SQL_FILES, BRONZE_LOADS
 from scripts.managers import (
     SchemaManager,
     AuditManager
 )
-
-class Layer(StrEnum):
-    BRONZE = "bronze"
-    SILVER = "silver"
-    GOLD = "gold"
 
 class BronzeLoader:
     def __init__(self, conn: PGConnection):
@@ -62,18 +57,15 @@ class BronzeLoader:
         start = datetime.now()
         
         try:
-            self.schema.execute(Path('db/init/01_schema.sql'))
-            self.schema.execute(Path('db/init/02_bronze_load.sql'))
-            self.schema.execute(Path('db/init/06_audit.sql'))
-            self.load_to_pg(Path("data/raw/raw_yellow_tripdata_2026_01.parquet"), "raw_taxi_trips", Layer.BRONZE)
-            self.load_to_pg(Path("data/raw/taxi_zone_lookup.csv"), "raw_taxi_lookup", Layer.BRONZE)
+            self.schema.execute_many(BRONZE_SQL_FILES)
+            for load in BRONZE_LOADS:    
+                self.load_to_pg(
+                    load["file"],
+                    load["table"],
+                    Layer.BRONZE
+                )
             
-            rows = self.schema.fetch(
-                """
-                SELECT COUNT(*)
-                FROM bronze.raw_taxi_trips
-                """
-            )
+            rows = self.schema.count("bronze.raw_taxi_trips")
             
             self.audit.log_pipeline(
                 layer="bronze",

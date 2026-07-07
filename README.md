@@ -49,6 +49,7 @@ nyc-taxi-warehouse/
 │   ├── main.py          # Main app
 │   ├── managers/
 │   ├── reporters/
+│   ├── configs/
 │   └── layers/
 │       ├── bronze/
 │       ├── silver/

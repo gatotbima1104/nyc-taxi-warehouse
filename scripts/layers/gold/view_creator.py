@@ -1,5 +1,5 @@
 from scripts.managers import SchemaManager
-from pathlib import Path
+from scripts.configs import GOLD_VIEW_CREATOR_FILE
 from utils.helpers import Helper
 
 class ViewCreator:
@@ -8,5 +8,5 @@ class ViewCreator:
         self.schema = SchemaManager(conn)
         
     def create(self):
-        self.schema.execute(Path('db/init/05_views.sql'))
+        self.schema.execute(GOLD_VIEW_CREATOR_FILE)
         Helper.log(message="Views created successfully ... ")

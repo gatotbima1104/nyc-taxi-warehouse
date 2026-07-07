@@ -31,6 +31,9 @@ class SchemaManager():
         with self.connection.cursor() as cur:
             cur.execute(sql)
             return cur.fetchone()[0]
+        
+    def count(self, table):
+        return self.fetch(f"SELECT COUNT(*) FROM {table}")
 
     def report(self, filepath: Path) -> int:
         sql = self.read(filepath)

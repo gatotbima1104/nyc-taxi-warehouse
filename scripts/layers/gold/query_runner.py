@@ -1,7 +1,7 @@
 from datetime import datetime
-from pathlib import Path
 from utils.helpers import Helper
 from contextlib import redirect_stdout
+from scripts.configs import GOLD_QUERY_RUNNER_FILE, BUSINESS_ANALYTICS_LOG_PATH
 
 from scripts.managers import (
     SchemaManager,
@@ -16,13 +16,11 @@ class QueryRunner:
     
     def run(self):
         start = datetime.now()
-
+        
         try:
-            queries = sorted(Path("db/queries").glob("*.sql"))
-            
-            with open("logs/business_analytics.log", "w", encoding="utf-8") as log:
+            with open(BUSINESS_ANALYTICS_LOG_PATH, "w", encoding="utf-8") as log:
                 with redirect_stdout(log):
-                    self.schema.report_many(queries)
+                    self.schema.report_many(GOLD_QUERY_RUNNER_FILE)
 
             self.audit.log_pipeline(
                 layer="gold",

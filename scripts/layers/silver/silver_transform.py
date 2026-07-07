@@ -1,6 +1,7 @@
 from datetime import datetime
-from pathlib import Path
 from utils.helpers import Helper
+
+from scripts.configs import SILVER_SQL_FILES, SILVER_OUTPUTS
 
 from scripts.managers import (
     SchemaManager,
@@ -17,48 +18,8 @@ class SilverTransformer:
         start = datetime.now()
         
         try:
-            silver_layer = [
-                Path('db/init/03_silver_transform.sql'),
-                *sorted(Path('db/schemas/silver').glob('*.sql'))
-            ]
-            self.schema.execute_many(silver_layer)
-            
-            rows_taxi_cleaned = self.schema.fetch(
-                """
-                SELECT COUNT(*) 
-                FROM silver.taxi_trips_cleaned
-                """
-            )
-            
-            rows_data_quality_issues = self.schema.fetch(
-                """
-                SELECT COUNT(*) 
-                FROM silver.data_quality_issues
-                """
-            )
-            
-            print(f'[LOAD TO SILVER] Loaded {rows_taxi_cleaned:,} valid rows ...')
-            print(f'[LOAD TO SILVER] Loaded {rows_data_quality_issues:,} invalid rows ...')
-            
-            self.audit.log_pipeline(
-                layer="silver",
-                process_name="load valid data to silver",
-                start_time=start,
-                end_time=datetime.now(),
-                rows_processed=rows_taxi_cleaned,
-                status="SUCCESS",
-                message="[SILVER] Valid data loaded successfully."
-            )
-            
-            self.audit.log_pipeline(
-                layer="silver",
-                process_name="load invalid data to silver",
-                start_time=start,
-                end_time=datetime.now(),
-                rows_processed=rows_data_quality_issues,
-                status="SUCCESS",
-                message="[SILVER] Invalid Data loaded successfully."
-            )
+            self.schema.execute_many(SILVER_SQL_FILES)
+            self._log_outputs(start)
             
             Helper.log(message="Transform to Silver successfully ... ")
             
@@ -75,3 +36,20 @@ class SilverTransformer:
             )
             
             raise
+    
+    def _log_outputs(self, start_time):
+
+        for output in SILVER_OUTPUTS:
+            rows = self.schema.count(output["table"])
+            
+            print(f'[LOAD TO SILVER] Loaded {rows:,} rows into {output["table"]}')
+            
+            self.audit.log_pipeline(
+                layer="silver",
+                process_name=output["process"],
+                start_time=start_time,
+                end_time=datetime.now(),
+                rows_processed=rows,
+                status="SUCCESS",
+                message=output["message"]
+            )
