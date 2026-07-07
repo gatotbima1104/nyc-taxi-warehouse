@@ -220,17 +220,19 @@ TAXI_DATA_FILENAME=raw_yellow_tripdata_2026_01.parquet
 TAXI_ZONE_LOOKUP_TABLE=taxi_zone_lookup.csv
 ```
 
-4. Build and start the services.
+4. Build the services.
 
 ```bash
 docker compose up -d --build
 ```
 
+5. Run the services.
+
 ```bash
 bash scripts/run_pipeline.sh
 ```
 
-5. Expected Output
+6. Expected Output.
 ![alt text](docs/docker_logs.png)
 
 ## Report
